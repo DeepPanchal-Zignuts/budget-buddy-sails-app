@@ -5,7 +5,7 @@ import { MdEdit, MdDelete } from 'react-icons/md';
 import axios from 'axios';
 import moment from 'moment';
 import { toast } from 'react-hot-toast';
-import { DatePicker } from 'antd';
+import { DatePicker, Pagination } from 'antd';
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
@@ -18,6 +18,8 @@ const Dashboard = () => {
   const [account, setAccount] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const fetchAccount = () => {
@@ -74,10 +76,12 @@ const Dashboard = () => {
             frequency,
             selectedDate,
             type,
+            page: currentPage,
           }
         );
         console.log(res);
         setExpenses(res.data.expenses);
+        setTotalPages(res.data.totalPages);
         if (res?.data?.success) {
           toast.success(res?.data?.message);
         } else {
@@ -89,7 +93,11 @@ const Dashboard = () => {
       }
     };
     fetchExpenses();
-  }, [frequency, selectedDate, type]);
+  }, [frequency, selectedDate, type, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page); // Update the current page number
+  };
 
   const formatDate = (date) => {
     return moment(date).format('YYYY-MM-DD');
@@ -109,25 +117,16 @@ const Dashboard = () => {
       // Update expenses state by removing the deleted expense
       setExpenses(expenses.filter((item) => item.id !== expense.id));
 
-      // Update account balance based on the deleted expense
-      const updatedBalance =
-        expense.type === 'Expense'
-          ? account.balance + parseInt(expense.amount)
-          : account.balance - parseInt(expense.amount);
-
-      // Update the account balance in the backend
-      await axios.patch(
-        `${process.env.REACT_APP_API}/api/v1/account/update-account/${account.id}`,
-        { balance: updatedBalance }
-      );
-
       // Update account state with the new balance
-      setAccount({ ...account, balance: updatedBalance });
+      setAccount({ ...account, balance: res.data.afterUpdateAccount.balance });
 
       // Update local storage with the updated account data
       localStorage.setItem(
         'selectedAccount',
-        JSON.stringify({ ...account, balance: updatedBalance })
+        JSON.stringify({
+          ...account,
+          balance: res.data.afterUpdateAccount.balance,
+        })
       );
 
       if (res.data && res.data.success) {
@@ -272,6 +271,15 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
+        </div>
+        <div className="flex justify-center mb-4 ">
+          <Pagination
+            defaultCurrent={1}
+            current={currentPage}
+            total={50}
+            className="border border-slate-400 bg-slate-400 rounded-xl"
+            onChange={(value) => setCurrentPage(value)}
+          />
         </div>
       </div>
       <Modal

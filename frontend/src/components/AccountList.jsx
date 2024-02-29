@@ -4,7 +4,7 @@ import { MdEdit, MdDelete } from 'react-icons/md';
 import axios from 'axios';
 import { useAccount } from '../context/AccountContext';
 
-const AccountList = ({onAccountCreated}) => {
+const AccountList = ({ onAccountCreated }) => {
   const { accounts, setAccounts } = useAccount();
   const [editAccount, setEditAccount] = useState(null);
   const [name, setName] = useState('');

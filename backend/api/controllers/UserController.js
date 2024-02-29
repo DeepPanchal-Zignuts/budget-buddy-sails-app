@@ -1,5 +1,5 @@
 // Imports
-const { messages, success, HTTP_STATUS } = require('../../config/constants');
+const { HTTP_STATUS } = require('../../config/constants');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
 const passwordHashing = require('../helpers/passwordHashing');
@@ -23,8 +23,8 @@ module.exports = {
 
       // User Registration Success
       return res.status(HTTP_STATUS.CREATED).send({
-        success: success.SuccessTrue,
-        message: messages.RegistrationSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.REGISTRATION_SUCCESS'),
         newUser,
       });
     } catch (error) {
@@ -32,15 +32,15 @@ module.exports = {
       if (error.code === 'E_UNIQUE') {
         // Handle unique constraint violations
         return res.status(HTTP_STATUS.UNAUTHORIZED).send({
-          success: success.SuccessFalse,
-          message: messages.InvalidCredentials,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.INVALID_CREDENTIALS'),
         });
       }
 
       // Return error exit for other types of errors
       return res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: success.SuccessFalse,
-        message: messages.RegistrationError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.REGISTRATION_ERROR'),
         error,
       });
     }
@@ -57,8 +57,8 @@ module.exports = {
       // If User not exists
       if (!user) {
         return res.status(HTTP_STATUS.UNAUTHORIZED).send({
-          success: success.SuccessFalse,
-          message: messages.InvalidCredentials,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.USER_NOT_FOUND'),
         });
       }
 
@@ -68,22 +68,22 @@ module.exports = {
       // If passwords didn't matched
       if (!isMatch) {
         return res.status(HTTP_STATUS.UNAUTHORIZED).send({
-          success: success.SuccessFalse,
-          message: messages.InvalidCredentials,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.INVALID_CREDENTIALS'),
         });
       }
 
       // Generate Token
       const token = await JWT.sign(
-        { _id: user._id },
+        { _id: user.id },
         process.env.JWT_SECRET_KEY,
         { expiresIn: '7d' }
       );
 
       // User Login Success
       return res.status(HTTP_STATUS.SUCCESS).send({
-        success: success.SuccessTrue,
-        message: messages.LoginSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.LOGIN_SUCCESS'),
         user,
         token,
       });
@@ -92,15 +92,15 @@ module.exports = {
       if (error.code === 'E_UNIQUE') {
         // Handle unique constraint violations
         return res.status(HTTP_STATUS.UNAUTHORIZED).send({
-          success: success.SuccessFalse,
-          message: messages.InvalidCredentials,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.INVALID_CREDENTIALS'),
         });
       }
 
       // Return error exit for other types of errors
       return res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: success.SuccessFalse,
-        message: messages.RegistrationError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.REGISTRATION_ERROR'),
         error,
       });
     }

@@ -1,5 +1,5 @@
 // Imports
-const { messages, success, HTTP_STATUS } = require('../../config/constants');
+const { HTTP_STATUS } = require('../../config/constants');
 
 // Exports
 module.exports = {
@@ -13,15 +13,15 @@ module.exports = {
 
       // Account Created Successfully
       return res.status(HTTP_STATUS.CREATED).send({
-        success: success.SuccessTrue,
-        message: messages.AccountCreateSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_CREATE_SUCCESS'),
         newAccount,
       });
     } catch (error) {
       // Server Error
       return res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: false,
-        message: messages.AccountCreatingError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_CREATING_ERROR'),
         error,
       });
     }
@@ -38,22 +38,22 @@ module.exports = {
       // If Account not found
       if (!accounts) {
         return res.status(HTTP_STATUS.NOT_FOUND).send({
-          success: success.SuccessFalse,
-          message: messages.NoAccountsFound,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.NO_ACCOUNTS_FOUND'),
         });
       }
 
       // Accounts Fetched Successfully
       return res.status(HTTP_STATUS.SUCCESS).send({
-        success: success.SuccessTrue,
-        message: messages.AccountFetchSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_FETCH_SUCCESS'),
         accounts,
       });
     } catch (error) {
       // Server Error
       return res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: success.SuccessFalse,
-        message: messages.AccountFetchingError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_FETCHING_ERROR'),
         error,
       });
     }
@@ -65,6 +65,17 @@ module.exports = {
       const id = req.params.id;
       const { name, balance } = req.body;
 
+      // Verify if the account with the given id exists
+      const existingAccount = await Account.findOne({ _id: id });
+
+      // If Account not found
+      if (!existingAccount) {
+        return res.status(HTTP_STATUS.NOT_FOUND).send({
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.ACCOUNT_NOT_FOUND'),
+        });
+      }
+
       // Update the existing account based on id
       const account = await Account.updateOne({ _id: id }).set({
         name,
@@ -74,22 +85,22 @@ module.exports = {
       // If Account not found
       if (!account) {
         return res.status(HTTP_STATUS.NOT_FOUND).send({
-          success: success.SuccessFalse,
-          message: messages.NoAccountsFound,
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.NO_ACCOUNTS_FOUND'),
         });
       }
 
       // Account Updated Successfully
       return res.status(HTTP_STATUS.SUCCESS).send({
-        success: success.SuccessTrue,
-        message: messages.AccountUpdateSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_UPDATE_SUCCESS'),
         data: account,
       });
     } catch (error) {
       // Server Error
       return res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: success.SuccessFalse,
-        message: messages.AccountUpdateError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_UPDATE_ERROR'),
         error,
       });
     }
@@ -100,19 +111,30 @@ module.exports = {
     try {
       const id = req.params.id;
 
+      // Verify if the account with the given id exists
+      const existingAccount = await Account.findOne({ _id: id });
+
+      // If Account not found
+      if (!existingAccount) {
+        return res.status(HTTP_STATUS.NOT_FOUND).send({
+          success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+          message: req.i18n.__('MESSAGES.ACCOUNT_NOT_FOUND'),
+        });
+      }
+
       // Deleting Account by its id
       await Account.destroyOne({ _id: id });
 
       // Account Deleted Successfully
       res.status(HTTP_STATUS.SUCCESS).send({
-        success: success.SuccessTrue,
-        message: messages.AccountDeleteSuccess,
+        success: req.i18n.__('SUCCESS.SUCCESS_TRUE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_DELETE_SUCCESS'),
       });
     } catch (error) {
       // Server Error
       res.status(HTTP_STATUS.SERVER_ERROR).send({
-        success: success.SuccessFalse,
-        message: messages.AccountDeletingError,
+        success: req.i18n.__('SUCCESS.SUCCESS_FALSE'),
+        message: req.i18n.__('MESSAGES.ACCOUNT_DELETING_ERROR'),
         error,
       });
     }

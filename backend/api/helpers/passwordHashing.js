@@ -1,4 +1,3 @@
-const { salt } = require('../../config/constants');
 const bcrypt = require('bcrypt');
 
 module.exports = {
@@ -19,7 +18,7 @@ module.exports = {
       // Hashing the password using Salt Rounds
       const hashedPassword = await bcrypt.hash(
         inputs.password,
-        salt.SaltRounds
+        req.i18n.__('SALT.SALT_ROUNDS')
       );
 
       return hashedPassword;
