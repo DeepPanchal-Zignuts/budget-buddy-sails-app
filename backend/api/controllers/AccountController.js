@@ -122,6 +122,16 @@ module.exports = {
         });
       }
 
+      // Find the Expenses created using this account
+      const accountsExpenses = await Expense.find({
+        account: existingAccount.id,
+      });
+
+      // If account has expenses then delete them from db
+      if (accountsExpenses) {
+        await Expense.destroy({ account: existingAccount.id });
+      }
+
       // Deleting Account by its id
       await Account.destroyOne({ _id: id });
 
