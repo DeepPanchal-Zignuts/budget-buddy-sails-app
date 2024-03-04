@@ -1,6 +1,5 @@
 // Imports
 const { HTTP_STATUS } = require('../../config/constants');
-// const moment = require('moment');
 
 // Export
 module.exports = {

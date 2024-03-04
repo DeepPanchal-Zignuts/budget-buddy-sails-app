@@ -1,3 +1,7 @@
+const bcrypt = require('bcrypt');
+const JWT = require('jsonwebtoken');
+const passwordHashing = require('../api/helpers/passwordHashing');
+
 module.exports = {
   HTTP_STATUS: {
     SUCCESS: 200,
@@ -7,4 +11,7 @@ module.exports = {
     NOT_FOUND: 404,
     SERVER_ERROR: 500,
   },
+  bcrypt,
+  JWT,
+  passwordHashing,
 };

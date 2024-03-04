@@ -1,6 +1,5 @@
 // Imports
-const JWT = require('jsonwebtoken');
-const { HTTP_STATUS } = require('../../config/constants');
+const { HTTP_STATUS, JWT } = require('../../config/constants');
 
 // Export
 module.exports = async (req, res, proceed) => {

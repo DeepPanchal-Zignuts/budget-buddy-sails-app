@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const { bcrypt } = require('../../config/constants');
 
 module.exports = {
   friendlyName: 'hash Password',

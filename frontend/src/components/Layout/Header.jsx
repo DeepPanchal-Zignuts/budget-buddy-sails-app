@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { MdClose } from "react-icons/md";
-import Icon from "../../Images/Icon.png";
-import { useAuth } from "../../context/UserContext";
-import toast from "react-hot-toast";
-import { FaUser } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { MdClose } from 'react-icons/md';
+import Icon from '../../Images/Icon.png';
+import { useAuth } from '../../context/UserContext';
+import toast from 'react-hot-toast';
+import { TbUserSquareRounded, TbLogout2 } from 'react-icons/tb';
+import { LiaMoneyCheckAltSolid } from 'react-icons/lia';
+import { SiBitdefender } from 'react-icons/si';
 
 const Header = () => {
   // States
   const [isOpen, setIsOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
-  const [loginUser, setLoginUser] = useState("");
+  const [loginUser, setLoginUser] = useState('');
   const [auth, setAuth] = useAuth();
 
   // Logout
@@ -19,15 +21,15 @@ const Header = () => {
     setAuth({
       ...auth,
       user: null,
-      token: "",
+      token: '',
     });
-    localStorage.removeItem("auth");
-    toast.success("Logout Successfully");
+    localStorage.removeItem('auth');
+    toast.success('Logout Successfully');
   };
 
   // To Display name of the user if exists
   useEffect(() => {
-    const isUser = JSON.parse(localStorage.getItem("auth"));
+    const isUser = JSON.parse(localStorage.getItem('auth'));
     if (isUser) {
       setLoginUser(isUser.user);
     }
@@ -42,7 +44,12 @@ const Header = () => {
     <>
       <nav className="sticky top-0 z-50 flex items-center justify-between flex-wrap p-3 bg-slate-700 shadow-md ">
         <div className="flex items-center flex-shrink-0 text-white mr-6 lg:mr-72">
-          <img src={Icon} className="w-100 h-10 mr-2" alt="Logo" />
+          <SiBitdefender size={40} />
+          <img
+            src={Icon}
+            className="w-100 h-10 mr-2 bg-transparent"
+            alt="Logo"
+          />
         </div>
         <div className="block lg:hidden">
           <button
@@ -54,7 +61,7 @@ const Header = () => {
         </div>
         <div
           className={`w-full flex justify-end items-center flex-grow lg:flex lg:items-center lg:w-auto lg:justify-center ${
-            isOpen ? "block" : "hidden"
+            isOpen ? 'block' : 'hidden'
           }`}
         >
           {!auth.user ? (
@@ -79,26 +86,28 @@ const Header = () => {
                   onClick={toggleDropdown}
                   className=" px-4 flex items-center border  text-blue-500 rounded-md focus:outline-none font-semibold"
                 >
-                  <FaUser className="pr-2" size={30} />
+                  <TbUserSquareRounded className="pr-2" size={35} />
                   <p className="pt-3">{loginUser && loginUser.name}</p>
                 </button>
                 {dropOpen && (
                   <div className="absolute lg:mt-14 w-40 bg-slate-500 rounded-md shadow-lg z-10 ">
                     <NavLink
                       className={
-                        "block px-4 py-2 text-white hover:bg-slate-700 w-full text-left"
+                        'flex px-4 py-2 text-white hover:bg-slate-700 w-full text-left items-center'
                       }
                       to="/dashboard/account-page"
                     >
-                      Account
+                      <LiaMoneyCheckAltSolid size={20} />
+                      <span className="pl-2">Accounts</span>
                     </NavLink>
 
                     <NavLink
                       to="/login"
                       onClick={handleLogout}
-                      className="block px-4 py-2 text-white hover:bg-slate-700 w-full text-left"
+                      className="flex px-4 py-2 text-white hover:bg-slate-700 w-full text-left items-center"
                     >
-                      Logout
+                      <TbLogout2 size={20} />
+                      <span className="pl-2">Logout</span>
                     </NavLink>
                   </div>
                 )}

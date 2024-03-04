@@ -1,8 +1,10 @@
 // Imports
-const { HTTP_STATUS } = require('../../config/constants');
-const bcrypt = require('bcrypt');
-const JWT = require('jsonwebtoken');
-const passwordHashing = require('../helpers/passwordHashing');
+const {
+  HTTP_STATUS,
+  bcrypt,
+  JWT,
+  passwordHashing,
+} = require('../../config/constants');
 
 // Export
 module.exports = {
