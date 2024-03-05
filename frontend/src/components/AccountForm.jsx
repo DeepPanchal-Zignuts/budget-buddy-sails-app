@@ -41,6 +41,7 @@ const AccountForm = ({ onAccountCreated }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mb-2 lg:mr-2 px-4 py-2 bg-slate-500 rounded-md focus:outline-none focus:border-blue-500 text-white"
+              required
             />
 
             <input
@@ -49,6 +50,7 @@ const AccountForm = ({ onAccountCreated }) => {
               value={balance}
               onChange={(e) => setBalance(e.target.value)}
               className="mb-2 bg-slate-500  lg:mr-2 px-4 py-2  rounded-md focus:outline-none focus:border-blue-500 text-white"
+              required
             />
             <button
               type="submit"

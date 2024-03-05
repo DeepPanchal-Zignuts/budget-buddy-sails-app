@@ -5,6 +5,7 @@ import { CiBank } from 'react-icons/ci';
 import axios from 'axios';
 import { MdAccountBalanceWallet } from 'react-icons/md';
 import { useAccount } from '../context/AccountContext';
+import DeleteModal from './DeleteModal';
 
 const AccountList = ({ onAccountCreated }) => {
   const { accounts, setAccounts } = useAccount();
@@ -12,6 +13,7 @@ const AccountList = ({ onAccountCreated }) => {
   const [owner, setOwner] = useState('');
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
+  const [selectedAccountToDelete, setSelectedAccountToDelete] = useState(null);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -39,20 +41,24 @@ const AccountList = ({ onAccountCreated }) => {
     fetchAccounts();
   }, [setAccounts, onAccountCreated]);
 
-  const handleDeleteAccount = async (id) => {
+  // Handle delete account click
+  const handleDeleteAccountClick = (account) => {
+    setSelectedAccountToDelete(account);
+  };
+
+  // Handle delete account confirmation
+  const handleConfirmDeleteAccount = async () => {
     try {
       const res = await axios.delete(
-        `${process.env.REACT_APP_API}/api/v1/account/delete-account/${id}`
+        `${process.env.REACT_APP_API}/api/v1/account/delete-account/${selectedAccountToDelete.id}`
       );
       if (res.data.success) {
         toast.success(res.data.message);
         // Remove the deleted account from the local state
-        setAccounts(accounts.filter((account) => account.id !== id));
+        setAccounts(accounts.filter((acc) => acc.id !== selectedAccountToDelete.id));
         // Remove the selected account from local storage if it matches the deleted account
-        const selectedAccount = JSON.parse(
-          localStorage.getItem('selectedAccount')
-        );
-        if (selectedAccount && selectedAccount.id === id) {
+        const selectedAccount = JSON.parse(localStorage.getItem('selectedAccount'));
+        if (selectedAccount && selectedAccount.id === selectedAccountToDelete.id) {
           localStorage.removeItem('selectedAccount');
         }
       } else {
@@ -61,8 +67,17 @@ const AccountList = ({ onAccountCreated }) => {
     } catch (error) {
       console.error('Error:', error.response.data.error);
       toast.error('Failed to Delete Account!');
+    } finally {
+      // Reset selected account for deletion
+      setSelectedAccountToDelete(null);
     }
   };
+
+  // Handle cancel delete account
+  const handleCancelDeleteAccount = () => {
+    setSelectedAccountToDelete(null);
+  };
+
 
   const handleEditAccount = (account) => {
     setEditAccount(account);
@@ -157,7 +172,7 @@ const AccountList = ({ onAccountCreated }) => {
                 {!editAccount || editAccount.id !== account.id ? (
                   <>
                     <button
-                      onClick={() => handleDeleteAccount(account.id)}
+                      onClick={() => handleDeleteAccountClick(account)} // Pass account to the click handler
                       className="text-red-600 hover:text-red-800 focus:outline-none"
                     >
                       <MdDelete size={20} />
@@ -195,6 +210,12 @@ const AccountList = ({ onAccountCreated }) => {
                 </button>
               </div>
             </div>
+            <DeleteModal
+              visible={selectedAccountToDelete === account} // Pass visibility state
+              onOk={handleConfirmDeleteAccount} // Pass confirmation handler
+              onCancel={handleCancelDeleteAccount}
+              account={account} // Pass cancel handler
+            />
           </div>
         ))}
       </div>
