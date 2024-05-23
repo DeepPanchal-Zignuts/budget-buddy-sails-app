@@ -18,9 +18,8 @@ const Modal = ({ isOpen, closeModal, edit }) => {
       let res;
       if (edit !== null) {
         // If edit object exists, update the expense
-
         res = await axios.patch(
-          `${process.env.REACT_APP_API}/api/v1/expense/update-expense/${edit.id}`,
+          `${process.env.REACT_APP_API}/api/v1/expense/update-expense/${edit._id}`,
           {
             amount,
             type,
@@ -41,7 +40,7 @@ const Modal = ({ isOpen, closeModal, edit }) => {
             category,
             reference,
             description,
-            account: selectedAccount.id,
+            account: selectedAccount._id,
           }
         );
 

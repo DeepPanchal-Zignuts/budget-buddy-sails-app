@@ -9,22 +9,29 @@
  */
 
 module.exports.routes = {
-  // User Routes
-  'POST /api/v1/auth/register': 'UserController.register',
-  'POST /api/v1/auth/login': 'UserController.login',
-  'GET /api/v1/auth/user-auth': 'UserController.private',
 
-  // Account Routes
-  'GET /api/v1/account/get-accounts/:id': 'AccountController.getAllAccounts',
-  'POST /api/v1/account/add-account': 'AccountController.createAccount',
-  'PATCH /api/v1/account/update-account/:id': 'AccountController.updateAccount',
-  'DELETE /api/v1/account/delete-account/:id':
-    'AccountController.deleteAccount',
+  /***************************************************************************
+  *                                                                          *
+  * Make the view located at `views/homepage.ejs` your home page.            *
+  *                                                                          *
+  * (Alternatively, remove this and add an `index.html` file in your         *
+  * `assets` directory)                                                      *
+  *                                                                          *
+  ***************************************************************************/
 
-  //Expense Routes
-  'POST /api/v1/expense/add-expense': 'ExpenseController.addExpense',
-  'POST /api/v1/expense/get-expense': 'ExpenseController.getAllExpense',
-  'PATCH /api/v1/expense/update-expense/:id': 'ExpenseController.editExpense',
-  'DELETE /api/v1/expense/delete-expense/:id':
-    'ExpenseController.deleteExpense',
+  '/': { view: 'pages/homepage' },
+
+
+  /***************************************************************************
+  *                                                                          *
+  * More custom routes here...                                               *
+  * (See https://sailsjs.com/config/routes for examples.)                    *
+  *                                                                          *
+  * If a request to a URL doesn't match any of the routes in this file, it   *
+  * is matched against "shadow routes" (e.g. blueprint routes).  If it does  *
+  * not match any of those, it is matched against static assets.             *
+  *                                                                          *
+  ***************************************************************************/
+
+
 };

@@ -9,19 +9,14 @@
  */
 
 module.exports.policies = {
-  /***************************************************************************
-   *                                                                          *
-   * Default policy for all controllers and actions, unless overridden.       *
-   * (`true` allows public access)                                            *
-   *                                                                          *
-   ***************************************************************************/
 
-  AccountController: {
-    '*': 'isAuthenticated',
-  },
-  ExpenseController: {
-    '*': 'isAuthenticated',
-  },
+  /***************************************************************************
+  *                                                                          *
+  * Default policy for all controllers and actions, unless overridden.       *
+  * (`true` allows public access)                                            *
+  *                                                                          *
+  ***************************************************************************/
 
   // '*': true,
+
 };

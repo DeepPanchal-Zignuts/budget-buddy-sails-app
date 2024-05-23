@@ -3,5 +3,8 @@
 @tailwind utilities;
 
 *{
-    font-family: Verdana;
+    font-family: sans-serif;
+}
+body{
+    @apply bg-black
 }

@@ -5,7 +5,7 @@ import { ImUser } from 'react-icons/im';
 import { MdEmail } from 'react-icons/md';
 import { GoArrowRight } from 'react-icons/go';
 import { useNavigate } from 'react-router-dom';
-import homepageImage from '../Images/HomePage.png';
+import homepage from '../Images/HomePage.png';
 
 const HomePage = () => {
   const [loginUser, setLoginUser] = useState('');
@@ -19,62 +19,47 @@ const HomePage = () => {
     }
   }, []);
 
-  const handleGoDashboard = () => {
-    navigate('/dashboard');
-  };
-
   const handleAccountsPage = () => {
     navigate('/dashboard/account-page');
   };
 
   return (
     <Layout>
-      <div className="bg-slate-950 flex lg:flex-row items-center justify-center min-h-screen">
-        <div className="sm:w-96 lg:w-full lg:grid lg:grid-cols-2 lg:gap-10 lg:items-center">
-          <div>
-            <img
-              src={homepageImage}
-              alt="HomePageImage"
-              className="lg:w-full"
-            />
-          </div>
-
-          <div>
-            <div className="bg-slate-100 m-5 bg-opacity-10 border border-slate-100 rounded-xl w-2/7 lg:w-full flex flex-col items-center justify-center p-5 lg:m-0 ">
-              <FaUserAlt
-                size={100}
-                className="text-white bg-slate-700 rounded-xl ml-5 mr-5"
-              />
-              <div className="grid grid-cols-1">
-                <h1 className="text-gray-100 text-left text-xl font-bold mt-4 flex items-center">
-                  <ImUser size={25} />:
-                  <span className="text-cyan-500 text-center text-sm sm:text-xl pl-2">
-                    {loginUser && loginUser.name}
-                  </span>
-                </h1>
-
-                <h1 className="text-gray-100 text-center text-xl font-bold mt-4 flex items-center">
-                  <MdEmail size={25} />:
-                  <span className="text-cyan-500 text-center text-sm sm:text-xl pl-2">
-                    {loginUser && loginUser.email}
-                  </span>
-                </h1>
-
-                <div>
-                  <button
-                    onClick={handleAccountsPage}
-                    className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold mt-4 py-2 px-4 rounded-lg"
-                  >
-                    <span className="pr-2">Go to Accounts</span>{' '}
-                    <GoArrowRight size={20} />
-                  </button>
-                </div>
-              </div>
-            </div>
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-2 lg:gap-10 lg:items-center">
+      <div className="order-2 lg:order-1 text-white m-5 flex justify-center items-center">
+        <div className="m-12 text-center lg:text-left">
+          <h1 className="text-4xl lg:text-5xl">
+            <span className="font-bold dark:text-green-400">Expenzify:</span>
+            An Expense Manager
+          </h1>
+          <p className="text-xl">
+            Managing expense is now easy, login to start...
+          </p>
+          <div className="mt-3 flex flex-col sm:flex-row sm:justify-center lg:justify-start">
+            <button
+              onClick={() => navigate('/register')}
+              className="bg-green-700 bg-opacity-40 text-green-300 hover:bg-green-300 hover:bg-opacity-30 border-none p-2 rounded-xl mt-3 sm:mt-0 sm:mr-3"
+            >
+              Register
+            </button>
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-green-500 hover:bg-green-600 text-black border-none p-2 rounded-xl mt-3 sm:mt-0 flex items-center justify-center"
+            >
+              Login
+              <GoArrowRight size={20}/>
+            </button>
           </div>
         </div>
       </div>
-    </Layout>
+      <div className="order-1 lg:order-2 mt-12 sm:mt-14 xl:mt-1">
+        <img src={homepage} alt="HomePageImage" className="w-full" />
+      </div>
+    </div>
+  </div>
+</Layout>
+
   );
 };
 

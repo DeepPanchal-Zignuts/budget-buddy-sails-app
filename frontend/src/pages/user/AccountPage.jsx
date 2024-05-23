@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import AccountList from "../../components/AccountList";
-import AccountForm from "../../components/AccountForm";
-import Layout from "../../components/Layout/Layout";
+import React, { useState } from 'react';
+import AccountList from '../../components/AccountList';
+import AccountForm from '../../components/AccountForm';
+import Layout from '../../components/Layout/Layout';
 
 const AccountPage = () => {
   const [accounts, setAccounts] = useState([]);

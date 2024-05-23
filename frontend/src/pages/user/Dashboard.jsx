@@ -68,11 +68,11 @@ const Dashboard = () => {
         const selectedAccount = JSON.parse(
           localStorage.getItem('selectedAccount')
         );
-        console.log(selectedAccount);
+
         const res = await axios.post(
           `${process.env.REACT_APP_API}/api/v1/expense/get-expense`,
           {
-            account: selectedAccount.id,
+            account: selectedAccount._id,
             frequency,
             selectedDate,
             type,
@@ -111,7 +111,7 @@ const Dashboard = () => {
   const deleteExpense = async (expense) => {
     try {
       const res = await axios.delete(
-        `${process.env.REACT_APP_API}/api/v1/expense/delete-expense/${expense.id}`
+        `${process.env.REACT_APP_API}/api/v1/expense/delete-expense/${expense._id}`
       );
 
       // Update expenses state by removing the deleted expense
@@ -142,7 +142,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col h-screen bg-slate-950">
+      <div className="flex flex-col min-h-screen bg-slate-950">
         <div className="flex-1 p-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
             <div className="bg-green-200 border-2 border-green-500 rounded-xl p-4 text-center">
@@ -236,7 +236,7 @@ const Dashboard = () => {
               </thead>
               <tbody>
                 {expenses.map((expense) => (
-                  <tr key={expense.id}>
+                  <tr key={expense._id}>
                     <td className="px-6 py-4 whitespace-no-wrap border">
                       {formatDate(expense.date)}
                     </td>
@@ -278,7 +278,7 @@ const Dashboard = () => {
             current={currentPage}
             total={50}
             className="border border-slate-400 bg-slate-400 rounded-xl"
-            onChange={(value) => setCurrentPage(value)}
+            onChange={handlePageChange}
           />
         </div>
       </div>

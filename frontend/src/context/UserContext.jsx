@@ -1,19 +1,19 @@
-import { useState, useEffect, useContext, createContext } from "react";
-import axios from "axios";
+import { useState, useEffect, useContext, createContext } from 'react';
+import axios from 'axios';
 // Creating a context
 const UserContext = createContext();
 
 // Creating a context provider
 const AuthProvider = ({ children }) => {
   // Initializing the state, user as null and token as empty
-  const [auth, setAuth] = useState({ user: null, token: "" });
+  const [auth, setAuth] = useState({ user: null, token: '' });
 
   // To make headers present in each request
-  axios.defaults.headers.common["Authorization"] = auth?.token;
+  axios.defaults.headers.common['Authorization'] = auth?.token;
 
   // Creating a provider where the children will have access to the state
   useEffect(() => {
-    const data = localStorage.getItem("auth");
+    const data = localStorage.getItem('auth');
     if (data) {
       const parseData = JSON.parse(data);
       setAuth({
@@ -24,6 +24,7 @@ const AuthProvider = ({ children }) => {
     }
     //eslint-disable-next-line
   }, []);
+
   return (
     <UserContext.Provider value={[auth, setAuth]}>
       {children}

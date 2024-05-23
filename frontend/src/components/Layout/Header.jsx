@@ -2,19 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { MdClose } from 'react-icons/md';
-import Icon from '../../Images/Icon.png';
-import { useAuth } from '../../context/UserContext';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/UserContext';
+import NavIcon from '../../Images/Icon.png';
 import { TbUserSquareRounded, TbLogout2 } from 'react-icons/tb';
 import { LiaMoneyCheckAltSolid } from 'react-icons/lia';
-import { SiBitdefender } from 'react-icons/si';
+import { Icon } from '@iconify/react';
 
 const Header = () => {
-  // States
   const [isOpen, setIsOpen] = useState(false);
-  const [dropOpen, setDropOpen] = useState(false);
-  const [loginUser, setLoginUser] = useState('');
   const [auth, setAuth] = useAuth();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Logout
   const handleLogout = () => {
@@ -27,96 +37,145 @@ const Header = () => {
     toast.success('Logout Successfully');
   };
 
-  // To Display name of the user if exists
-  useEffect(() => {
-    const isUser = JSON.parse(localStorage.getItem('auth'));
-    if (isUser) {
-      setLoginUser(isUser.user);
-    }
-  }, []);
-
-  // Dropdown Toggle
-  const toggleDropdown = () => {
-    setDropOpen(!dropOpen);
+  const toggleNavbar = () => {
+    setIsOpen(!isOpen);
   };
 
+  const isUser = JSON.parse(localStorage.getItem('auth'));
+
   return (
-    <>
-      <nav className="sticky top-0 z-50 flex items-center justify-between flex-wrap p-3 bg-slate-700 shadow-md ">
-        <div className="flex items-center flex-shrink-0 text-white mr-6 lg:mr-72">
-          <SiBitdefender size={40} />
-          <img
-            src={Icon}
-            className="w-100 h-10 mr-2 bg-transparent"
-            alt="Logo"
-          />
+    <nav className="fixed top-2 left-2 right-2 z-50 bg-zinc-600 bg-opacity-40 backdrop-blur-lg rounded-xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <NavLink to="/" className="flex items-center text-white font-bold">
+              <Icon
+                icon="oi:transfer"
+                width={30}
+                className="pr-2 text-green-400"
+              />
+              <img
+                src={NavIcon}
+                className="w-32 mr-2 bg-transparent "
+                alt="Logo"
+              />
+            </NavLink>
+            {/* Render links when not in mobile view */}
+          </div>
+          {!isMobile ? (
+            isUser ? (
+              <div className=" flex justify-between items-center space-x-4 text-white">
+                <NavLink
+                  to="/"
+                  className="hover:bg-gray-700 hover:shadow-sm hover:shadow-teal-400 px-3 py-2 flex items-center rounded-md text-md font-semibold "
+                >
+                  <TbUserSquareRounded
+                    className="pr-2 text-teal-400"
+                    size={30}
+                  />
+                  {isUser?.user?.name}
+                </NavLink>
+                <NavLink
+                  to="/dashboard/account-page"
+                  className="flex items-center hover:shadow-sm hover:shadow-green-400 hover:bg-gray-700 px-3 py-2 rounded-md text-md font-semibold"
+                >
+                  <LiaMoneyCheckAltSolid
+                    className="pr-2 text-green-400"
+                    size={30}
+                  />
+                  Accounts
+                </NavLink>
+                <NavLink
+                  to="/login"
+                  onClick={handleLogout}
+                  className="flex items-center hover:shadow-sm hover:shadow-red-400 hover:bg-gray-700 px-3 py-2 rounded-md text-md font-semibold"
+                >
+                  <TbLogout2 className="pr-2 text-red-400" size={30} />
+                  Logout
+                </NavLink>
+              </div>
+            ) : (
+              <div className=" flex justify-between items-center space-x-4 text-white">
+                <NavLink
+                  to="/register"
+                  className="hover:text-green-400 hover:bg-zinc-700 px-3 py-2 flex items-center rounded-md text-md font-medium "
+                >
+                  Register
+                </NavLink>
+                <NavLink
+                  to="/login"
+                  className="flex items-center hover:bg-zinc-700 hover:text-green-400 px-3 py-2 rounded-md text-md font-medium"
+                >
+                  Login
+                </NavLink>
+              </div>
+            )
+          ) : (
+            <div className="-mr-2 flex md:hidden">
+              <button
+                onClick={toggleNavbar}
+                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-zinc-700 focus:outline-none focus:bg-zinc-700 focus:text-green-400"
+              >
+                {isOpen ? <MdClose size={24} /> : <GiHamburgerMenu size={24} />}
+              </button>
+            </div>
+          )}
         </div>
-        <div className="block lg:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center px-3 py-2 rounded text-black-500 hover:text-black-400"
-          >
-            {isOpen ? <MdClose size={30} /> : <GiHamburgerMenu size={30} />}
-          </button>
-        </div>
-        <div
-          className={`w-full flex justify-end items-center flex-grow lg:flex lg:items-center lg:w-auto lg:justify-center ${
-            isOpen ? 'block' : 'hidden'
-          }`}
-        >
-          {!auth.user ? (
-            <div className="lg:text-lg font-bold lg:mx-auto lg:mr-0 lg:rounded-md lg:flex lg:justify-end">
+
+        {/* Responsive menu */}
+        {isOpen &&
+          (isUser ? (
+            <div className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <hr />
+                <NavLink
+                  to="/"
+                  className="text-white hover:bg-slate-700 flex items-center px-3 py-2 rounded-md text-base font-medium"
+                >
+                  <TbUserSquareRounded
+                    className="pr-2 text-teal-400"
+                    size={30}
+                  />
+                  {isUser?.user?.name}
+                </NavLink>
+                <NavLink
+                  to="/dashboard/account-page"
+                  className="text-white hover:bg-slate-700 flex items-center px-3 py-2 rounded-md text-base font-medium"
+                >
+                  <LiaMoneyCheckAltSolid
+                    className="pr-2 text-green-400"
+                    size={30}
+                  />
+                  Accounts
+                </NavLink>
+                <NavLink
+                  to="/login"
+                  onClick={handleLogout}
+                  className="text-white hover:bg-slate-700 flex items-center px-3 py-2 rounded-md text-base font-medium"
+                >
+                  <TbLogout2 className="pr-2 text-red-400" size={30} />
+                  Logout
+                </NavLink>
+              </div>
+            </div>
+          ) : (
+            <div className=" px-2 pt-2 pb-3 space-y-1 sm:px-3 text-white">
               <NavLink
                 to="/register"
-                className="block text-white hover:text-gray-300 lg:pr-5 lg:pl-5 lg:inline-block lg:mt-0  lg:ml-4 "
+                className="hover:text-green-400 hover:bg-zinc-700 flex items-center px-3 py-2 rounded-md text-base font-medium "
               >
                 Register
               </NavLink>
               <NavLink
                 to="/login"
-                className="block mt-4 lg:inline-block hover:text-gray-300 lg:pl-5 lg:pr-5 lg:mt-0 text-white mr-4"
+                className="hover:text-green-400 hover:bg-zinc-700 flex items-center px-3 py-2 rounded-md text-base font-medium"
               >
                 Login
               </NavLink>
             </div>
-          ) : (
-            <>
-              <div className="relative lg:mx-auto lg:mr-0 lg:rounded-md lg:flex lg:justify-end">
-                <button
-                  onClick={toggleDropdown}
-                  className=" px-4 flex items-center border  text-blue-500 rounded-md focus:outline-none font-semibold"
-                >
-                  <TbUserSquareRounded className="pr-2" size={35} />
-                  <p className="pt-3">{loginUser && loginUser.name}</p>
-                </button>
-                {dropOpen && (
-                  <div className="absolute lg:mt-14 w-40 bg-slate-500 rounded-md shadow-lg z-10 ">
-                    <NavLink
-                      className={
-                        'flex px-4 py-2 text-white hover:bg-slate-700 w-full text-left items-center'
-                      }
-                      to="/dashboard/account-page"
-                    >
-                      <LiaMoneyCheckAltSolid size={20} />
-                      <span className="pl-2">Accounts</span>
-                    </NavLink>
-
-                    <NavLink
-                      to="/login"
-                      onClick={handleLogout}
-                      className="flex px-4 py-2 text-white hover:bg-slate-700 w-full text-left items-center"
-                    >
-                      <TbLogout2 size={20} />
-                      <span className="pl-2">Logout</span>
-                    </NavLink>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </nav>
-    </>
+          ))}
+      </div>
+    </nav>
   );
 };
 

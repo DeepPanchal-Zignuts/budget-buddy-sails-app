@@ -18,12 +18,14 @@ const AccountList = ({ onAccountCreated }) => {
   useEffect(() => {
     const fetchAccounts = async () => {
       const auth = JSON.parse(localStorage.getItem('auth'));
+
       // Check if auth object exists
-      if (auth?.user?.id) {
+      if (auth?.user?._id) {
         try {
           const res = await axios.get(
-            `${process.env.REACT_APP_API}/api/v1/account/get-accounts/${auth.user.id}`
+            `${process.env.REACT_APP_API}/api/v1/account/get-accounts/${auth.user._id}`
           );
+
           if (res.data.success) {
             setAccounts(res.data.accounts);
             setOwner(auth?.user?.name);
@@ -50,15 +52,22 @@ const AccountList = ({ onAccountCreated }) => {
   const handleConfirmDeleteAccount = async () => {
     try {
       const res = await axios.delete(
-        `${process.env.REACT_APP_API}/api/v1/account/delete-account/${selectedAccountToDelete.id}`
+        `${process.env.REACT_APP_API}/api/v1/account/delete-account/${selectedAccountToDelete._id}`
       );
       if (res.data.success) {
         toast.success(res.data.message);
         // Remove the deleted account from the local state
-        setAccounts(accounts.filter((acc) => acc.id !== selectedAccountToDelete.id));
+        setAccounts(
+          accounts.filter((acc) => acc._id !== selectedAccountToDelete._id)
+        );
         // Remove the selected account from local storage if it matches the deleted account
-        const selectedAccount = JSON.parse(localStorage.getItem('selectedAccount'));
-        if (selectedAccount && selectedAccount.id === selectedAccountToDelete.id) {
+        const selectedAccount = JSON.parse(
+          localStorage.getItem('selectedAccount')
+        );
+        if (
+          selectedAccount &&
+          selectedAccount._id === selectedAccountToDelete._id
+        ) {
           localStorage.removeItem('selectedAccount');
         }
       } else {
@@ -78,7 +87,6 @@ const AccountList = ({ onAccountCreated }) => {
     setSelectedAccountToDelete(null);
   };
 
-
   const handleEditAccount = (account) => {
     setEditAccount(account);
     setName(account.name);
@@ -94,7 +102,7 @@ const AccountList = ({ onAccountCreated }) => {
       const updatedAccount = { ...editAccount, name, balance };
 
       const res = await axios.patch(
-        `${process.env.REACT_APP_API}/api/v1/account/update-account/${editAccount.id}`,
+        `${process.env.REACT_APP_API}/api/v1/account/update-account/${editAccount._id}`,
         { name: updatedAccount.name, balance: updatedAccount.balance }
       );
 
@@ -103,7 +111,7 @@ const AccountList = ({ onAccountCreated }) => {
         // Update the account in the local state
         setAccounts(
           accounts.map((acc) =>
-            acc.id === editAccount.id ? updatedAccount : acc
+            acc._id === editAccount._id ? updatedAccount : acc
           )
         );
         // Clear the edit state and input fields
@@ -126,20 +134,19 @@ const AccountList = ({ onAccountCreated }) => {
     // Replace '/expense-income-management' with your actual route
     window.location.href = '/dashboard';
   };
-
   return (
     <>
       <h1 className="text-white text-center text-xl font-semibold mt-5">
         {owner}'s Accounts
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-slate-950">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 p-4 bg-slate-950">
         {accounts.map((account) => (
           <div
-            key={account.id}
-            className="bg-slate-700 rounded-xl shadow-md p-4 flex flex-col justify-between border"
+            key={account._id}
+            className="bg-slate-700 rounded-2xl shadow-inner p-4 flex flex-row justify-between shadow-slate-500"
           >
             <div>
-              {editAccount && editAccount.id === account.id ? (
+              {editAccount && editAccount._id === account._id ? (
                 <>
                   <input
                     type="text"
@@ -156,30 +163,38 @@ const AccountList = ({ onAccountCreated }) => {
                 </>
               ) : (
                 <>
-                  <h1 className="flex items-center text-3xl font-semibold text-orange-400 italic">
+                  <h1 className="flex items-center text-3xl font-semibold text-amber-400 italic">
                     <CiBank />
                     <span className="pl-2">{account.name}</span>
                   </h1>
-                  <p className="flex items-center text-2xl text-cyan-200">
+                  <p className="flex items-center text-2xl text-green-400">
                     <MdAccountBalanceWallet />
                     <span className="font-bold pl-2">{account.balance}</span>
                   </p>
+                  <div>
+                    <button
+                      onClick={() => handleGoIn(account)}
+                      className="border border-blue-300 shadow-sm shadow-blue-300 hover:bg-blue-600  hover:shadow-blue-300 text-white font-semibold px-4 py-2 rounded-xl"
+                    >
+                      Go in
+                    </button>
+                  </div>
                 </>
               )}
             </div>
-            <div className="mt-4 flex justify-between items-center">
+            <div className=" flex justify-between items-start">
               <div className="flex gap-x-2">
-                {!editAccount || editAccount.id !== account.id ? (
+                {!editAccount || editAccount._id !== account._id ? (
                   <>
                     <button
                       onClick={() => handleDeleteAccountClick(account)} // Pass account to the click handler
-                      className="text-red-600 hover:text-red-800 focus:outline-none"
+                      className="text-red-500 hover:text-red-700 focus:outline-none"
                     >
                       <MdDelete size={20} />
                     </button>
                     <button
                       onClick={() => handleEditAccount(account)}
-                      className="text-yellow-500 hover:text-yellow-700 focus:outline-none"
+                      className="text-blue-400 hover:text-blue-600 focus:outline-none"
                     >
                       <MdEdit size={20} />
                     </button>
@@ -200,14 +215,6 @@ const AccountList = ({ onAccountCreated }) => {
                     </button>
                   </>
                 )}
-              </div>
-              <div>
-                <button
-                  onClick={() => handleGoIn(account)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded"
-                >
-                  Go in
-                </button>
               </div>
             </div>
             <DeleteModal
