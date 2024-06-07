@@ -9,29 +9,31 @@
  */
 
 module.exports.routes = {
+  // User Controller
+  'GET /api/v1/auth/user-auth': 'UserController.privateRoute',
+  'POST /api/v1/auth/register': 'UserController.signUpUser',
+  'POST /api/v1/auth/login': 'UserController.signInUser',
 
-  /***************************************************************************
-  *                                                                          *
-  * Make the view located at `views/homepage.ejs` your home page.            *
-  *                                                                          *
-  * (Alternatively, remove this and add an `index.html` file in your         *
-  * `assets` directory)                                                      *
-  *                                                                          *
-  ***************************************************************************/
+  // Account Controller
+  'POST /api/v1/account/add-account': 'AccountController.createAccount',
+  'GET /api/v1/account/get-accounts/:id':
+    'AccountController.getAllAccountsById',
+  'PATCH /api/v1/account/update-account/:id': 'AccountController.editAccount',
+  'DELETE /api/v1/account/delete-account/:id':
+    'AccountController.deleteAccount',
 
-  '/': { view: 'pages/homepage' },
+  // Expense Controller
+  'POST /api/v1/expense/add-expense': 'ExpenseController.createExpense',
+  'POST /api/v1/expense/get-expense': 'ExpenseController.getAllExpenses',
+  'POST /api/v1/expense/amountAnalytics': 'ExpenseController.amountAnalytics',
+  'POST /api/v1/expense/weekly-trend':
+    'ExpenseController.recentExpenseAndSpendingTrend',
+  'PATCH /api/v1/expense/update-expense/:id': 'ExpenseController.editExpense',
+  'POST /api/v1/expense/delete-expense/:id': 'ExpenseController.deleteExpense',
 
-
-  /***************************************************************************
-  *                                                                          *
-  * More custom routes here...                                               *
-  * (See https://sailsjs.com/config/routes for examples.)                    *
-  *                                                                          *
-  * If a request to a URL doesn't match any of the routes in this file, it   *
-  * is matched against "shadow routes" (e.g. blueprint routes).  If it does  *
-  * not match any of those, it is matched against static assets.             *
-  *                                                                          *
-  ***************************************************************************/
-
-
+  // Account Logs Controller
+  'GET /api/v1/account/get-accounts-logs/:id':
+    'AccountLogsController.createAccountLogs',
+  'DELETE /api/v1/account/delete-log/:id':
+    'AccountLogsController.deleteAccountLogs',
 };

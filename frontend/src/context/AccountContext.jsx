@@ -18,7 +18,6 @@ const AccountProvider = ({ children }) => {
           const res = await axios.get(
             `${process.env.REACT_APP_API}/api/v1/account/get-accounts/${user?.id}`
           );
-          console.log('AccountContext-->>', res);
           if (res.data.success) {
             setAccounts(res.data.accounts);
           } else {

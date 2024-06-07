@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import toast from 'react-hot-toast';
 import { Avatar } from '@mui/material';
 import ExpenseIcon from '../Images/FormImage.png';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Icon } from '@iconify/react';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ const Register = () => {
           password,
         }
       );
+
       if (res.data.success) {
         toast.success(res.data && res.data.message);
         setLoading(false);
@@ -37,8 +38,7 @@ const Register = () => {
       }
     } catch (error) {
       setLoading(false);
-      console.log(error);
-      if (error.response && error.response.status === 401) {
+      if (error.response) {
         toast.error(error.response.data.message);
       } else {
         toast.error('Something went wrong!');
@@ -72,8 +72,11 @@ const Register = () => {
             Register
           </h2>
           <form className="space-y-4" onSubmit={handleFormSubmit}>
-          <div>
-              <label htmlFor="fullName" className="block text-white font-medium">
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-white font-medium"
+              >
                 Full Name
               </label>
               <input

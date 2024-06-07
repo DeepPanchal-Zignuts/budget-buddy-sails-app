@@ -1,32 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { MdClose } from 'react-icons/md';
 
 const Modal = ({ isOpen, closeModal, edit }) => {
-  const [amount, setAmount] = useState(edit ? edit.amount : 0);
-  const [type, setType] = useState(edit ? edit.type : '');
-  const [date, setDate] = useState(edit ? edit.date : '');
-  const [category, setCategory] = useState(edit ? edit.category : '');
-  const [reference, setReference] = useState(edit ? edit.reference : '');
-  const [description, setDescription] = useState(edit ? edit.description : '');
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState('');
+  const [pending, setPending] = useState('No');
+  const [date, setDate] = useState('');
+  const [category, setCategory] = useState('');
+  const [subject, setSubject] = useState('');
+  const [details, setDetails] = useState('');
+  const [useCurrentDate, setUseCurrentDate] = useState(false);
+
+  useEffect(() => {
+    if (edit) {
+      setAmount(edit.amount);
+      setType(edit.type);
+      setPending(edit.isPending);
+      setDate(new Date(edit.date).toISOString().split('T')[0]);
+      setCategory(edit.category);
+      setSubject(edit.subject);
+      setDetails(edit.details);
+    }
+  }, [edit]);
+
+  const handleCheckboxChange = (e) => {
+    setUseCurrentDate(e.target.checked);
+    if (e.target.checked) {
+      const currentDate = new Date().toISOString().split('T')[0];
+      console.log(currentDate);
+      setDate(currentDate);
+    } else {
+      setDate(edit ? edit.date : '');
+    }
+  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const selectedAccount = JSON.parse(localStorage.getItem('selectedAccount'));
     try {
       let res;
-      if (edit !== null) {
+      if (edit) {
         // If edit object exists, update the expense
         res = await axios.patch(
-          `${process.env.REACT_APP_API}/api/v1/expense/update-expense/${edit._id}`,
+          `${process.env.REACT_APP_API}/api/v1/expense/update-expense/${
+            edit._id || edit.id
+          }`,
           {
+            subject,
             amount,
             type,
             date,
             category,
-            reference,
-            description,
+            details,
+            pending,
           }
         );
       } else {
@@ -34,24 +62,26 @@ const Modal = ({ isOpen, closeModal, edit }) => {
         res = await axios.post(
           `${process.env.REACT_APP_API}/api/v1/expense/add-expense`,
           {
+            subject,
+            accountId: selectedAccount.id || selectedAccount._id,
             amount,
             type,
             date,
             category,
-            reference,
-            description,
-            account: selectedAccount._id,
+            details,
+            pending,
           }
         );
 
         // Update the account balance based on the transaction type
       }
+
       await localStorage.setItem(
         'selectedAccount',
         JSON.stringify(res?.data?.afterUpdateAccount)
       );
 
-      if (res.data.success) {
+      if (res?.data?.success) {
         toast.success(res.data && res.data.message);
         closeModal();
       } else {
@@ -59,7 +89,7 @@ const Modal = ({ isOpen, closeModal, edit }) => {
       }
     } catch (error) {
       console.log(error);
-      toast.error('Failed to add Expense!');
+      toast.error(error.response.data.message);
     }
   };
 
@@ -67,148 +97,230 @@ const Modal = ({ isOpen, closeModal, edit }) => {
     <>
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-slate-200 bg-opacity-50 z-50 overflow-hidden">
-          <div className="bg-slate-700 rounded-xl shadow-xl lg:w-1/2 w-3/4 p-3">
-            <div className="flex justify-end p-4">
-              <button
-                className="focus:outline-none"
-                onClick={closeModal}
-                aria-label="Close"
-              >
-                <MdClose className="w-6 h-6 text-gray-500 hover:text-gray-700" />
-              </button>
-            </div>
+          <div>
             <form className="space-y-4" onSubmit={handleFormSubmit}>
-              <div>
-                <label
-                  htmlFor="amount"
-                  className="block font-medium text-white pb-2"
-                >
-                  Amount
-                </label>
-                <input
-                  type="text"
-                  id="amount"
-                  className="w-full bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  placeholder="ex. $100"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="type"
-                  className="block font-medium text-white pb-2"
-                >
-                  Type
-                </label>
-                <select
-                  id="type"
-                  className="w-full bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  required
-                >
-                  <option value="">Select Type</option>
-                  <option value="Income">Income</option>
-                  <option value="Expense">Expense</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="date"
-                  className="block font-medium text-white pb-2"
-                >
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  className="w-full bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="category"
-                  className="block font-medium text-white pb-2"
-                >
-                  Category
-                </label>
-                <select
-                  id="category"
-                  className="w-full bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  <option value="Food">Food</option>
-                  <option value="Transportation">Transportation</option>
-                  <option value="Utilities">Utilities</option>
-                  <option value="Entertainment">Entertainment</option>
-                  <option value="Health & Medical">Health & Medical</option>
-                  <option value="Education">Education</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Personal Care">Personal Care</option>
-                  <option value="Travel">Travel</option>
-                  <option value="Insurance">Insurance</option>
-                  <option value="Taxes">Taxes</option>
-                  <option value="Debt Payments">Debt Payments</option>
-                  <option value="Investments">Investments</option>
-                  <option value="Gifts & Donations">Gifts & Donations</option>
-                  <option value="Subscriptions & Memberships">
-                    Subscriptions & Memberships
-                  </option>
-                  <option value="Maintenance">Maintenance</option>
-                  <option value="Childcare">Childcare</option>
-                  <option value="Pet Care">Pet Care</option>
-                  <option value="Miscellaneous">Miscellaneous</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="reference"
-                  className="block font-medium text-white pb-2"
-                >
-                  Reference
-                </label>
-                <input
-                  type="text"
-                  id="reference"
-                  className="w-full bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  placeholder="Reference"
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block font-medium text-white pb-2"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  className="w-full h-24 bg-slate-500 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-blue-400 text-white"
-                  placeholder="Description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                ></textarea>
-              </div>
+              <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full max-h-screen overflow-y-auto ">
+                <div className="bg-white dark:bg-zinc-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="flex justify-end">
+                    <button
+                      className="focus:outline-none"
+                      onClick={closeModal}
+                      aria-label="Close"
+                    >
+                      <MdClose className="w-6 h-6 text-zinc-400 hover:text-gray-500" />
+                    </button>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="mt-3 sm:mt-0 sm:ml-4 text-left">
+                      <h3
+                        className="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+                        id="modal-title"
+                      >
+                        {edit ? 'Edit Expense' : 'Add New Expense'}
+                      </h3>
+                      <div className="mt-2">
+                        <p
+                          className="text-sm text-gray-500"
+                          id="modal-description"
+                        >
+                          Add the subject, choose the category, enter the
+                          amount, select the date and add your expense/income
+                          with some details.
+                        </p>
 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-                >
-                  Save
-                </button>
+                        <div className="mt-3 sm:mt-4">
+                          <label
+                            htmlFor="subject"
+                            className="block text-white font-thin"
+                          >
+                            Subject
+                          </label>
+                          <input
+                            type="text"
+                            id="subject"
+                            className="w-full bg-zinc-950 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-slate-800 text-white"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            placeholder="Travel Expenses.."
+                            autoFocus
+                          />
+                          <label
+                            htmlFor="amount"
+                            className="block text-white font-thin pt-2"
+                          >
+                            Amount*
+                          </label>
+                          <div className="flex">
+                            <input
+                              type="number"
+                              id="amount"
+                              className="w-full bg-zinc-950 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-slate-800 text-white"
+                              value={amount}
+                              onChange={(e) => setAmount(e.target.value)}
+                              placeholder="5001"
+                              autoFocus
+                              required
+                            />
+                            <label className="text-white flex items-center ml-3">
+                              <input
+                                type="radio"
+                                id="default-radio-1"
+                                name="type"
+                                value="expense"
+                                required
+                                checked={type === 'expense'}
+                                onChange={(e) => setType(e.target.value)}
+                              />
+                              Expense
+                            </label>
+                            <label className="text-white flex items-center ml-3">
+                              <input
+                                type="radio"
+                                id="default-radio-2"
+                                name="type"
+                                value="income"
+                                required
+                                checked={type === 'income'}
+                                onChange={(e) => setType(e.target.value)}
+                              />
+                              Income
+                            </label>
+                          </div>
+
+                          <label
+                            htmlFor="date"
+                            className="block text-white font-thin pt-2"
+                          >
+                            Date*
+                          </label>
+                          <input
+                            type="date"
+                            id="date"
+                            className="w-full bg-zinc-950 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-slate-800 text-white"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            autoFocus
+                            required
+                            disabled={useCurrentDate}
+                          />
+                          <label className="text-white">
+                            <input
+                              type="checkbox"
+                              className=" rounded-lg accent-green-400 mx-1 m-2"
+                              checked={useCurrentDate}
+                              onChange={handleCheckboxChange}
+                            />
+                            Use current date
+                          </label>
+
+                          <label
+                            htmlFor="category"
+                            className="block text-white font-thin pt-2"
+                          >
+                            Category*
+                          </label>
+                          <select
+                            name="category"
+                            id="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full bg-zinc-950 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-slate-800 text-white"
+                            required
+                          >
+                            {type === 'expense' ? (
+                              <>
+                                <option label="Please Select" value=""></option>
+                                <option value="travel">Travel</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="education">Education</option>
+                                <option value="bills">Bills</option>
+                                <option value="insurance">Insurance</option>
+                                <option value="housing">Housing</option>
+                                <option value="transportation">
+                                  Transportation
+                                </option>
+                                <option value="food">Food & Dining</option>
+                                <option value="entertainment">
+                                  Entertainment
+                                </option>
+                                <option value="health">Health & Fitness</option>
+                                <option value="taxes">Taxes</option>
+                                <option value="personal">Personal Care</option>
+                                <option value="miscellaneous">
+                                  Miscellaneous
+                                </option>
+                              </>
+                            ) : (
+                              <>
+                                <option label="Please Select" value=""></option>
+                                <option value="salary">Salary</option>
+                                <option value="business">
+                                  Business Income
+                                </option>
+                                <option value="freelance">Freelance</option>
+                                <option value="investments">Investments</option>
+                                <option value="rental">Rental Income</option>
+                                <option value="pension">Pension</option>
+                                <option value="bonuses">Bonuses</option>
+                                <option value="gifts">Gifts</option>
+                                <option value="other">Other Income</option>
+                              </>
+                            )}
+                          </select>
+                          <label
+                            htmlFor="details"
+                            className="block text-white font-thin pt-2"
+                          >
+                            Details
+                          </label>
+                          <textarea
+                            type="text"
+                            id="details"
+                            rows="4"
+                            cols="50"
+                            className="w-full bg-zinc-950 border-gray-300 rounded-md py-2 px-3 focus:outline focus:border-slate-800 text-white"
+                            value={details}
+                            onChange={(e) => setDetails(e.target.value)}
+                            placeholder="Details.."
+                            autoFocus
+                          />
+                          <label
+                            htmlFor="pending"
+                            className="block text-white font-thin pt-2"
+                          >
+                            Pending
+                          </label>
+                          <label className="text-white">
+                            <input
+                              type="checkbox"
+                              className=" rounded-lg accent-green-400 mx-1 m-2"
+                              name="pending"
+                              checked={pending === 'Yes'}
+                              onChange={(e) =>
+                                setPending(e.target.checked ? 'Yes' : 'No')
+                              }
+                            />
+                            Yes, this expense is pending
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-zinc-900 px-4 py-3 sm:px-6 flex justify-end">
+                  <button
+                    onClick={closeModal}
+                    className="bg-zinc-700 bg-opacity-40 text-green-300 hover:bg-zinc-500 hover:bg-opacity-30 border-none p-2 rounded-xl mt-3 sm:mt-0 mr-3 mb-3"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-green-500 hover:bg-green-600 text-black border-none p-2 rounded-xl mt-3 sm:mt-0 flex items-center justify-center mb-3"
+                  >
+                    {edit ? 'Update' : 'Create'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
